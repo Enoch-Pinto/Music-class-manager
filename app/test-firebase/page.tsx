@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+export const dynamic = 'force-dynamic';
+
 export default function TestFirebasePage() {
   const [config, setConfig] = useState<any>(null);
   const [authStatus, setAuthStatus] = useState("Checking...");

@@ -1,3 +1,7 @@
+"use client";
+
+export const dynamic = 'force-dynamic';
+
 export default function Offline() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4">

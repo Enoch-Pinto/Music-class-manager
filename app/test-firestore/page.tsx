@@ -6,6 +6,8 @@ import { db } from "@/lib/firebase/config"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 
+export const dynamic = 'force-dynamic';
+
 export default function TestFirestorePage() {
   const [classes, setClasses] = useState<any[]>([])
   const [students, setStudents] = useState<any[]>([])
