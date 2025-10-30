@@ -9,6 +9,8 @@ import { signIn, signUp } from "@/lib/firebase/auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Music, ArrowLeft } from "lucide-react";
 
+export const dynamic = 'force-dynamic';
+
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");

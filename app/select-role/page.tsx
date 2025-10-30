@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Music } from "lucide-react"
 import { useRouter } from "next/navigation"
 
+export const dynamic = 'force-dynamic';
+
 export default function SelectRolePage() {
   const router = useRouter()
 

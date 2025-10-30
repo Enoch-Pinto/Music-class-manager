@@ -5,6 +5,8 @@ import { useAuth } from "@/lib/contexts/auth-context"
 import { useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 
+export const dynamic = 'force-dynamic';
+
 export default function Home() {
   const { user, loading } = useAuth()
   const router = useRouter()

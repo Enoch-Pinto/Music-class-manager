@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button"
 import { LogOut } from "lucide-react"
 import { logOut } from "@/lib/firebase/auth"
 
+export const dynamic = 'force-dynamic';
+
 export default function DashboardPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
