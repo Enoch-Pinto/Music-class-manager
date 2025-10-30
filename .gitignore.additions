@@ -1,0 +1,23 @@
+# Add to .gitignore
+.env.local
+.env*.local
+*.log
+.next/
+out/
+node_modules/
+.DS_Store
+*.pem
+.vercel
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# PWA
+public/sw.js.map
+public/workbox-*.js
+public/workbox-*.js.map
+sw.js
+sw.js.map
+workbox-*.js
+workbox-*.js.map
