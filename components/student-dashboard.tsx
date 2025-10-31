@@ -180,60 +180,23 @@ export function StudentDashboard() {
             </div>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
-            <ReminderSystem userType="student" classes={classes} />
+            <ReminderSystem 
+              userType="student" 
+              classes={classes.map(cls => ({
+                id: cls.id,
+                date: cls.date,
+                time: cls.time,
+                instrument: cls.instrument
+              }))} 
+            />
           </div>
         </div>
 
-        {showNotificationSettings && (
-          <Card className="mb-8 border-primary/20">
-            <CardHeader>
-              <CardTitle className="text-lg">Notification Preferences</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium">Email Reminders</label>
-                <input
-                  type="checkbox"
-                  checked={notifications.emailReminders}
-                  onChange={(e) => setNotifications({ ...notifications, emailReminders: e.target.checked })}
-                  className="w-4 h-4"
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium">SMS Reminders</label>
-                <input
-                  type="checkbox"
-                  checked={notifications.smsReminders}
-                  onChange={(e) => setNotifications({ ...notifications, smsReminders: e.target.checked })}
-                  className="w-4 h-4"
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium">Class Reminders</label>
-                <input
-                  type="checkbox"
-                  checked={notifications.classReminders}
-                  onChange={(e) => setNotifications({ ...notifications, classReminders: e.target.checked })}
-                  className="w-4 h-4"
-                />
-              </div>
-              <Button onClick={() => setShowNotificationSettings(false)} className="w-full" size="sm">
-                Save Preferences
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Payment Status Card */}
-        <Card
-          className={`mb-8 border-2 ${paymentStatus.paid ? "border-green-200 dark:border-green-900" : "border-red-200 dark:border-red-900"}`}
-        >
+        {/* Scheduled Classes - Moved to top */}
+        <Card className="mb-8">
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Monthly Payment Status</CardTitle>
-              {paymentStatus.paid && <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />}
-            </div>
-            <CardDescription>Fees collected monthly at the start of each month</CardDescription>
+            <CardTitle>Class Calendar</CardTitle>
+            <CardDescription>Your scheduled and completed classes</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
