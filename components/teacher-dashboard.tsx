@@ -29,6 +29,7 @@ interface Class {
   instrument: string
   feePerClass: number
   paid: boolean
+  completed: boolean
   notes?: string
   monthYear?: string
   monthlyPackage?: 4 | 8
@@ -95,6 +96,7 @@ export function TeacherDashboard() {
         instrument: cls.instrument,
         feePerClass: cls.feePerClass || 500,
         paid: cls.paid,
+        completed: cls.completed || false,
         notes: "",
         monthYear: cls.monthYear,
         monthlyPackage: cls.monthlyPackage,
