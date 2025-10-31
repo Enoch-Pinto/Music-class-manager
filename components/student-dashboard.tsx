@@ -71,29 +71,6 @@ export function StudentDashboard() {
     setSelectedDate(date)
   }
 
-  const toggleClassCompletion = async (classId: string, currentStatus: boolean) => {
-    try {
-      await updateClass(classId, { completed: !currentStatus })
-      // Reload classes to reflect changes
-      if (user?.email) {
-        const firebaseClasses = await getClassesByStudentEmail(user.email)
-        const formattedClasses = firebaseClasses.map((cls) => ({
-          id: cls.id,
-          date: cls.date,
-          time: cls.time,
-          instrument: cls.instrument,
-          feePerClass: cls.feePerClass,
-          completed: cls.completed,
-          paid: cls.paid,
-          teacherId: cls.teacherId,
-        }))
-        setClasses(formattedClasses)
-      }
-    } catch (error) {
-      console.error("Error updating class completion:", error)
-    }
-  }
-
   const completedClasses = classes.filter((c) => c.completed).length
   const totalClasses = classes.length
   const totalPaid = classes.filter((c) => c.paid).reduce((sum, c) => sum + c.feePerClass, 0)
@@ -192,11 +169,78 @@ export function StudentDashboard() {
           </div>
         </div>
 
-        {/* Scheduled Classes - Moved to top */}
+        {/* Scheduled Classes */}
         <Card className="mb-8">
           <CardHeader>
             <CardTitle>Class Calendar</CardTitle>
             <CardDescription>Your scheduled and completed classes</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="p-4 bg-secondary rounded-lg">
+                <p className="text-sm text-muted-foreground">Total Classes</p>
+                <p className="text-3xl font-bold">{totalClasses}</p>
+              </div>
+              <div className="p-4 bg-green-100 dark:bg-green-900 rounded-lg">
+                <p className="text-sm text-muted-foreground">Completed</p>
+                <p className="text-3xl font-bold">{completedClasses}</p>
+              </div>
+              <div className="p-4 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                <p className="text-sm text-muted-foreground">Upcoming</p>
+                <p className="text-3xl font-bold">{totalClasses - completedClasses}</p>
+              </div>
+            </div>
+            <div className="space-y-3">
+              {classes.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-8">No classes scheduled yet</p>
+              ) : (
+                classes.map((cls) => (
+                  <div
+                    key={cls.id}
+                    className={`p-4 border rounded-lg flex items-center justify-between gap-4 ${
+                      cls.completed ? "bg-secondary" : ""
+                    }`}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold">{cls.instrument}</p>
+                      <p className="text-sm text-muted-foreground flex items-center gap-1">
+                        <Calendar className="w-4 h-4" />
+                        {cls.date} at {cls.time}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`px-3 py-1 rounded-full text-sm font-medium ${
+                          cls.completed
+                            ? "bg-green-200 dark:bg-green-800 text-green-800 dark:text-green-100"
+                            : "bg-blue-200 dark:bg-blue-800 text-blue-800 dark:text-blue-100"
+                      }`}
+                      >
+                        {cls.completed ? "Completed" : "Upcoming"}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Calendar View */}
+        <div className="mb-8">
+          <CalendarView classes={calendarClasses} onDateSelect={handleDateSelect} userType="student" />
+        </div>
+
+        {/* Payment Status Card */}
+        <Card
+          className={`mb-8 border-2 ${paymentStatus.paid ? "border-green-200 dark:border-green-900" : "border-red-200 dark:border-red-900"}`}
+        >
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Monthly Payment Status</CardTitle>
+              {paymentStatus.paid && <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />}
+            </div>
+            <CardDescription>Fees collected monthly at the start of each month</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -250,54 +294,7 @@ export function StudentDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CreditCard className="w-5 h-5" />
-              Payment History by Month
-            </CardTitle>
-            <CardDescription>Track your monthly payments</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {monthlyPayments.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No payment history yet</p>
-              ) : (
-                monthlyPayments.map((payment) => (
-                  <div
-                    key={payment.month}
-                    className={`p-4 border rounded-lg flex items-center justify-between ${
-                      payment.paid
-                        ? "bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800"
-                        : "bg-orange-50 dark:bg-orange-950 border-orange-200 dark:border-orange-800"
-                    }`}
-                  >
-                    <div>
-                      <p className="font-semibold">
-                        {new Date(payment.month + "-01").toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                      </p>
-                      <p className="text-sm text-muted-foreground">{payment.classCount} classes</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-2xl font-bold">₹{payment.total.toLocaleString('en-IN')}</p>
-                      <span
-                        className={`px-3 py-1 rounded-full text-sm font-medium ${
-                          payment.paid
-                            ? "bg-green-200 dark:bg-green-800 text-green-800 dark:text-green-100"
-                            : "bg-orange-200 dark:bg-orange-800 text-orange-800 dark:text-orange-100"
-                        }`}
-                      >
-                        {payment.paid ? "✓ Paid" : "✗ Unpaid"}
-                      </span>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Scheduled Classes - Moved to top */}
+        {/* Payment History */}
         <Card className="mb-8">
           <CardHeader>
             <CardTitle>Class Calendar</CardTitle>

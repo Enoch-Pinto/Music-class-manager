@@ -261,6 +261,18 @@ export function TeacherDashboard() {
     }
   }
 
+  const toggleCompletedStatus = async (id: string) => {
+    const classToUpdate = classes.find((c) => c.id === id)
+    if (!classToUpdate) return
+
+    try {
+      await updateClass(id, { completed: !classToUpdate.completed })
+    } catch (error: any) {
+      console.error("Error updating class completion:", error)
+      alert("Failed to update class completion: " + error.message)
+    }
+  }
+
   const deleteClassHandler = async (id: string) => {
     if (!confirm("Are you sure you want to delete this class?")) return
 
@@ -671,6 +683,15 @@ export function TeacherDashboard() {
                         <div className="flex items-center gap-3">
                           <div
                             className={`px-3 py-1 rounded-full text-sm font-medium ${
+                              cls.completed
+                                ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
+                                : "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100"
+                            }`}
+                          >
+                            {cls.completed ? "Completed" : "Upcoming"}
+                          </div>
+                          <div
+                            className={`px-3 py-1 rounded-full text-sm font-medium ${
                               cls.paid
                                 ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
                                 : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100"
@@ -678,6 +699,9 @@ export function TeacherDashboard() {
                           >
                             {cls.paid ? "Paid" : "Unpaid"}
                           </div>
+                          <Button onClick={() => toggleCompletedStatus(cls.id)} variant="outline" size="sm">
+                            {cls.completed ? "Mark Upcoming" : "Mark Complete"}
+                          </Button>
                           <Button onClick={() => togglePaidStatus(cls.id)} variant="outline" size="sm">
                             {cls.paid ? "Mark Unpaid" : "Mark Paid"}
                           </Button>
