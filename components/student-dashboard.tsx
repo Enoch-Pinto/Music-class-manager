@@ -27,6 +27,7 @@ interface PaymentStatus {
   nextDueDate: string
 }
 
+// Student Dashboard - View only component for students
 export function StudentDashboard() {
   const { user } = useAuth()
   const [classes, setClasses] = useState<StudentClass[]>([])
