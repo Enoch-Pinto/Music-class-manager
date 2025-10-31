@@ -11,8 +11,10 @@ export default function SelectRolePage() {
   const router = useRouter()
 
   const handleRoleSelection = (role: "teacher" | "student") => {
-    // Store the selected role in sessionStorage
-    sessionStorage.setItem('userRole', role)
+    // Store the selected role in sessionStorage (browser only)
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('userRole', role)
+    }
     // Redirect to login with the role
     router.push(`/login?role=${role}`)
   }

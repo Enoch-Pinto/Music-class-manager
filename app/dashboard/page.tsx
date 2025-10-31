@@ -23,8 +23,8 @@ export default function DashboardPage() {
       return
     }
 
-    if (user) {
-      // Get stored role
+    if (user && typeof window !== 'undefined') {
+      // Get stored role (browser only)
       const storedRole = sessionStorage.getItem('userRole') as "teacher" | "student" | null
       if (storedRole) {
         setUserRole(storedRole)
@@ -38,7 +38,9 @@ export default function DashboardPage() {
   const handleLogout = async () => {
     try {
       await logOut()
-      sessionStorage.removeItem('userRole')
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('userRole')
+      }
       router.push('/select-role')
     } catch (error) {
       console.error("Logout error:", error)

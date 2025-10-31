@@ -28,17 +28,21 @@ function LoginForm() {
     const role = searchParams.get('role') as "teacher" | "student" | null;
     if (role) {
       setUserType(role);
-      // Store it in sessionStorage
-      sessionStorage.setItem('userRole', role);
+      // Store it in sessionStorage (browser only)
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('userRole', role);
+      }
     }
 
-    // Load saved credentials if remember me was checked
-    const savedEmail = localStorage.getItem('rememberedEmail');
-    const savedPassword = localStorage.getItem('rememberedPassword');
-    if (savedEmail && savedPassword) {
-      setEmail(savedEmail);
-      setPassword(savedPassword);
-      setRememberMe(true);
+    // Load saved credentials if remember me was checked (browser only)
+    if (typeof window !== 'undefined') {
+      const savedEmail = localStorage.getItem('rememberedEmail');
+      const savedPassword = localStorage.getItem('rememberedPassword');
+      if (savedEmail && savedPassword) {
+        setEmail(savedEmail);
+        setPassword(savedPassword);
+        setRememberMe(true);
+      }
     }
   }, [searchParams]);
 
@@ -51,13 +55,15 @@ function LoginForm() {
       if (isLogin) {
         await signIn(email, password);
         
-        // Save or clear credentials based on remember me
-        if (rememberMe) {
-          localStorage.setItem('rememberedEmail', email);
-          localStorage.setItem('rememberedPassword', password);
-        } else {
-          localStorage.removeItem('rememberedEmail');
-          localStorage.removeItem('rememberedPassword');
+        // Save or clear credentials based on remember me (browser only)
+        if (typeof window !== 'undefined') {
+          if (rememberMe) {
+            localStorage.setItem('rememberedEmail', email);
+            localStorage.setItem('rememberedPassword', password);
+          } else {
+            localStorage.removeItem('rememberedEmail');
+            localStorage.removeItem('rememberedPassword');
+          }
         }
       } else {
         await signUp(email, password, displayName, userType);
