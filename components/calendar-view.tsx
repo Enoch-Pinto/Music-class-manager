@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
 interface CalendarClass {
-  id: number
+  id: string | number
   date: string
   time: string
   instrument: string
