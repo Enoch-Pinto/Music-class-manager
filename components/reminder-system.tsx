@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Bell, X, CheckCircle } from "lucide-react"
@@ -15,15 +15,56 @@ interface Reminder {
   timestamp: Date
 }
 
-interface ReminderSystemProps {
-  userType: "teacher" | "student"
+interface MusicClass {
+  id: string
+  date: string
+  time: string
+  instrument: string
 }
 
-export function ReminderSystem({ userType }: ReminderSystemProps) {
-  // Empty reminders array - ready for Firebase integration
-  const [reminders] = useState<Reminder[]>([])
+interface ReminderSystemProps {
+  userType: "teacher" | "student"
+  classes?: MusicClass[]
+}
+
+export function ReminderSystem({ userType, classes = [] }: ReminderSystemProps) {
+  const [reminders, setReminders] = useState<Reminder[]>([])
   const [showReminders, setShowReminders] = useState(false)
   const [filter, setFilter] = useState<"all" | "unread" | "payment" | "class">("all")
+
+  // Generate reminders from upcoming classes
+  useEffect(() => {
+    if (classes.length === 0) return
+
+    const now = new Date()
+    const upcomingReminders: Reminder[] = []
+
+    classes.forEach((cls) => {
+      const classDate = new Date(cls.date)
+      const daysBefore = Math.floor((classDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+
+      // Create reminder for classes happening in the next 3 days
+      if (daysBefore >= 0 && daysBefore <= 3) {
+        const reminderText = daysBefore === 0 
+          ? 'today' 
+          : daysBefore === 1 
+          ? 'tomorrow' 
+          : `in ${daysBefore} days`
+
+        upcomingReminders.push({
+          id: `class-${cls.id}`,
+          type: "class",
+          title: `${cls.instrument} Class ${reminderText}`,
+          message: `Your ${cls.instrument} class is scheduled for ${classDate.toLocaleDateString()} at ${cls.time}`,
+          dueDate: `${classDate.toLocaleDateString()} ${cls.time}`,
+          read: false,
+          timestamp: classDate
+        })
+      }
+    })
+
+    setReminders(upcomingReminders)
+  }, [classes])
 
   const unreadCount = reminders.filter((r) => !r.read).length
 
@@ -33,6 +74,14 @@ export function ReminderSystem({ userType }: ReminderSystemProps) {
     if (filter === "class") return r.type === "class"
     return true
   })
+
+  const markAsRead = (id: string) => {
+    setReminders(reminders.map(r => r.id === id ? { ...r, read: true } : r))
+  }
+
+  const dismissReminder = (id: string) => {
+    setReminders(reminders.filter(r => r.id !== id))
+  }
 
   return (
     <div className="relative">
@@ -126,6 +175,7 @@ export function ReminderSystem({ userType }: ReminderSystemProps) {
                       <div className="flex gap-1 flex-shrink-0">
                         {!reminder.read && (
                           <Button
+                            onClick={() => markAsRead(reminder.id)}
                             variant="ghost"
                             size="sm"
                             className="h-6 w-6 p-0"
@@ -134,6 +184,7 @@ export function ReminderSystem({ userType }: ReminderSystemProps) {
                           </Button>
                         )}
                         <Button
+                          onClick={() => dismissReminder(reminder.id)}
                           variant="ghost"
                           size="sm"
                           className="h-6 w-6 p-0"

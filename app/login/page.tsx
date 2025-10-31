@@ -19,16 +19,26 @@ function LoginForm() {
   const [userType, setUserType] = useState<"student" | "teacher">("student");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Get role from URL parameter
+  // Get role from URL parameter and load saved credentials
   useEffect(() => {
     const role = searchParams.get('role') as "teacher" | "student" | null;
     if (role) {
       setUserType(role);
       // Store it in sessionStorage
       sessionStorage.setItem('userRole', role);
+    }
+
+    // Load saved credentials if remember me was checked
+    const savedEmail = localStorage.getItem('rememberedEmail');
+    const savedPassword = localStorage.getItem('rememberedPassword');
+    if (savedEmail && savedPassword) {
+      setEmail(savedEmail);
+      setPassword(savedPassword);
+      setRememberMe(true);
     }
   }, [searchParams]);
 
@@ -40,6 +50,15 @@ function LoginForm() {
     try {
       if (isLogin) {
         await signIn(email, password);
+        
+        // Save or clear credentials based on remember me
+        if (rememberMe) {
+          localStorage.setItem('rememberedEmail', email);
+          localStorage.setItem('rememberedPassword', password);
+        } else {
+          localStorage.removeItem('rememberedEmail');
+          localStorage.removeItem('rememberedPassword');
+        }
       } else {
         await signUp(email, password, displayName, userType);
       }
@@ -122,6 +141,21 @@ function LoginForm() {
                 minLength={6}
               />
             </div>
+
+            {isLogin && (
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="rememberMe"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                />
+                <Label htmlFor="rememberMe" className="text-sm font-normal cursor-pointer">
+                  Remember me
+                </Label>
+              </div>
+            )}
 
             {error && (
               <div className="p-3 bg-destructive/10 text-destructive rounded-lg text-sm">
